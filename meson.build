@@ -400,23 +400,10 @@ endif
 
 libcap_ng = not_found
 if not get_option('cap_ng').auto() or have_system or have_tools
-  libcap_ng = cc.find_library('cap-ng', has_headers: ['cap-ng.h'],
-                              required: get_option('cap_ng'),
-                              kwargs: static_kwargs)
-endif
-if libcap_ng.found() and not cc.links('''
-   #include <cap-ng.h>
-   int main(void)
-   {
-     capng_capability_to_name(CAPNG_EFFECTIVE);
-     return 0;
-   }''', dependencies: libcap_ng)
-  libcap_ng = not_found
-  if get_option('cap_ng').enabled()
-    error('could not link libcap-ng')
-  else
-    warning('could not link libcap-ng, disabling')
-  endif
+  libcap_ng = dependency('libcap-ng',
+                         method: 'pkg-config',
+                         required: get_option('cap_ng'),
+                         kwargs: static_kwargs)
 endif
 
 if get_option('xkbcommon').auto() and not have_system and not have_tools
